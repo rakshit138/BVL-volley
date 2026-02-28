@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /centers/{allPaths=**} {
+      allow create: if true;
+      allow read: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+  }
+}

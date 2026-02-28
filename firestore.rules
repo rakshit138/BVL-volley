@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Centers: anyone can create (public registration); only users listed in admins can read/update
+    match /centers/{centerId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    // Admins: only existing admins can create new admin docs (enforced in Cloud Function createAdmin)
+    match /admins/{adminId} {
+      allow read: if request.auth != null && request.auth.uid == adminId;
+      allow create, update, delete: if false;
+    }
+  }
+}
